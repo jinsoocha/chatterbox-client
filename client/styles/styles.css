@@ -91,6 +91,9 @@ form input[type=text] {
 .username {
     color: blue;
 }
+.roomname {
+    color: red;
+}
 .message-box {
     border: 3px black solid;
     border-radius: 2px;
