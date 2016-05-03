@@ -7,13 +7,26 @@ $(document).ready(function() {
   let app = {
     server: 'https://api.parse.com/1/classes/messages',
     init: function() {
-      $('#send').submit(this.handleSubmit);
+      $('#send').submit((e) => this.handleSubmit(e));
     },
     send: function(message) {
       $.ajax({
         url: this.server,
         type: 'POST',
-        data: JSON.stringify(message)
+        data: JSON.stringify(message),
+        contentType: 'application/json',
+        success: () => {
+          this.fetch();
+        },
+        error: (data) => console.error('chatterbox: Failed to send message', data)
+      });
+    },
+    handleSubmit: function(e) {
+      e.preventDefault();
+      this.send({
+        username: window.location.search.slice(10),
+        text: $('#message').val(),
+        roomname: 'main'
       });
     },
     fetch: function() {
@@ -40,14 +53,10 @@ $(document).ready(function() {
     addFriend: function(username) {
       console.log('added Friend: ' + username);
     },
-    handleSubmit: function(e) {
-      e.preventDefault();
-      console.log('Submitting', $('#message').val());
-    },
-    completedFetch(message) {
-      for (let result of message.results) {
-        this.addMessage(result);
-        console.log(result.text);
+    completedFetch(data) {
+      this.clearMessages();
+      for (let message of data.results) {
+        this.addMessage(message);
       }
     }
   };
