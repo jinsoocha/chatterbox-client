@@ -2,7 +2,6 @@
 
 //https://api.parse.com/1/classes/messages
 
-
 $(document).ready(function() {
   let app = {
     server: 'https://api.parse.com/1/classes/messages',
@@ -11,18 +10,19 @@ $(document).ready(function() {
     friends: {},
     init: function() {
       $('#send').submit((e) => app.handleSubmit(e));
-      app.addRoom(app.currentRoom);
-      $('#roomSelect').change(() => {
-        app.currentRoom = $('#roomSelect option:selected').text();
-        app.selectRoom();
-      });    
-      $('#newroom').click(() => {
+      $('#newroom').on('click', () => {
         let q = prompt('Add a new room');
         app.addRoom(q);
         app.currentRoom = q;
         $('#roomSelect option:selected').attr('selected', null);
         $(`#roomSelect option[value = ${q}]`).attr('selected', 'selected');
         app.selectRoom();
+      });
+      $('#roomSelect').change(() => {
+        console.log('changing room');
+        app.currentRoom = $('#roomSelect option:selected').text();
+        app.selectRoom();
+        app.fetch();
       });
       app.fetch();
       setInterval(() => {
@@ -57,10 +57,34 @@ $(document).ready(function() {
         data: {where: JSON.stringify({
           roomname: app.currentRoom === 'ALL ROOMS' ? undefined : app.currentRoom
         })},
-        success: (data) => app.completedFetch(data),
+        success: (data) => {
+          app.completedFetch(data);
+        },
+        error: (data) => console.error('chatterbox: Failed to fetch messages', data)
+      });
+      app.fetchRooms();
+    },
+    fetchRooms: function() {
+      $.ajax({
+        url: app.server,
+        type: 'GET',
+        contentType: 'application/json',
+        data: {
+          order: '-roomname',
+          keys: 'roomname'
+        },
+        success: (data) => {
+          var rooms = _.unique(_.pluck(data.results, 'roomname'));
+          rooms.unshift('ALL ROOMS');
+          for (var room of rooms) {
+            app.addRoom(room);
+          }
+          app.selectRoom();
+        },
         error: (data) => console.error('chatterbox: Failed to fetch messages', data)
       });
     },
+    
     clearMessages: function() {
       $('#chats').html('');
     },
@@ -73,8 +97,9 @@ $(document).ready(function() {
       thisMessage.find('.username').click(() => app.toggleFriend(message.username));
     },
     addRoom: function(roomname) {
+
       app.rooms[roomname] = app.rooms[roomname] ||
-        $('#roomSelect').append(`<option value=${_.escape(roomname)}>${_.escape(roomname)}</option>`);
+        $('#roomSelect').append(`<option value="${_.escape(roomname)}">${_.escape(roomname)}</option>`);
     },
     toggleFriend: function(username) {
       if (username !== window.location.search.slice(10)) {
@@ -93,10 +118,8 @@ $(document).ready(function() {
       app.clearMessages();
       for (let message of data.results) {
         app.addMessage(message);
-        app.addRoom(message.roomname);
       }
-      app.selectRoom();
-      for (username in app.friends) {
+      for (let username in app.friends) {
         $(`.username[data-username="${_.escape(username)}"]`).css('font-weight', 'bold');
       }
     },

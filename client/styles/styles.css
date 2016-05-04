@@ -1,8 +1,9 @@
+@import url(https://fonts.googleapis.com/css?family=Amatic+SC:400,700);
 body {
     background: #eee;
     text-align: center;
     padding: 0 25px;
-    font-family: arial, sans-serif;
+    font-family: 'Amatic SC', cursive;
 }
 
 #main, #chats {
@@ -10,7 +11,7 @@ body {
     margin: auto;
     text-align: left;
     background: white;
-    padding: 50px 60px;
+    padding: 30px 60px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
 }
@@ -49,7 +50,6 @@ body {
 form {
     padding: 20px;
     padding-left: 0;
-    margin-bottom: 20px;
 }
 
 form input[type=text] {
@@ -60,7 +60,6 @@ form input[type=text] {
 }
 
 .chat {
-    padding: 5px;
     margin-bottom: 5px;
     background-color: #eee;
 }
@@ -95,8 +94,8 @@ form input[type=text] {
     color: red;
 }
 .message-box {
-    border: 3px black solid;
-    border-radius: 2px;
-    padding: 10px;
-    margin-top: 5px;
+    margin-bottom: 15px;
+    line-height: 1.5em;
+    font-size: 16px;
+    letter-spacing: 1px;
 }
